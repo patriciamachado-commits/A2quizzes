@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A2 Quiz Dashboard - SQA Education</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0d9488 0%,#065f46 100%);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:0 auto}
+.header{background:#fff;border-radius:20px;padding:30px;margin-bottom:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.header h1{color:#065f46;font-size:1.5em;margin-bottom:5px}
+.header p{color:#888;font-size:.9em}
+.level-badge{background:#0d9488;color:#fff;padding:5px 14px;border-radius:20px;font-size:.85em;display:inline-block;margin-bottom:10px}
+.card{background:#fff;border-radius:16px;padding:25px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.card h2{color:#065f46;margin-bottom:15px;font-size:1.15em}
+.welcome-card{text-align:center;padding:30px}
+.welcome-icon{font-size:3em;margin-bottom:10px}
+.welcome-msg{font-size:1.2em;font-weight:600;color:#065f46}
+.sub{color:#888;margin-top:5px}
+.xp-banner{background:linear-gradient(135deg,#0d9488,#065f46);border-radius:14px;padding:20px;color:#fff;display:flex;justify-content:space-around;text-align:center;margin-bottom:20px}
+.xp-banner .stat{flex:1}
+.xp-banner .num{font-size:1.8em;font-weight:700;display:block}
+.xp-banner .lbl{font-size:.75em;opacity:.85}
+.progress-section{margin-bottom:20px}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.progress-title{font-weight:600;color:#333}
+.progress-percent{font-weight:700;color:#065f46}
+.progress-bar-bg{height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#0d9488,#065f46);border-radius:5px;transition:width .5s}
+.quiz-list{margin-top:20px}
+.quiz-item{display:flex;align-items:center;gap:15px;padding:18px;border:2px solid #e0e0e0;border-radius:14px;margin-bottom:12px;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+.quiz-item:hover{border-color:#0d9488;background:#f0fdf4;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.quiz-item.locked{opacity:.5;cursor:not-allowed;background:#f9f9f9}
+.quiz-item.locked:hover{border-color:#e0e0e0;transform:none;box-shadow:none}
+.quiz-item.completed{border-color:#22c55e;background:#f0fdf4}
+.quiz-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1em;flex-shrink:0}
+.quiz-item.available .quiz-num{background:#0d9488;color:#fff}
+.quiz-item.completed .quiz-num{background:#22c55e;color:#fff}
+.quiz-item.locked .quiz-num{background:#ccc;color:#fff}
+.quiz-info{flex:1}
+.quiz-title{font-weight:600;color:#333;font-size:1em}
+.quiz-desc{color:#888;font-size:.85em;margin-top:2px}
+.quiz-score{text-align:right;min-width:60px}
+.quiz-score .pct{font-size:1.2em;font-weight:700;color:#22c55e}
+.quiz-score .lbl{font-size:.7em;color:#888}
+.quiz-status{font-size:.8em;padding:4px 10px;border-radius:12px;font-weight:600;white-space:nowrap}
+.status-go{background:#d1fae5;color:#065f46}
+.status-done{background:#e8f5e9;color:#2e7d32}
+.status-lock{background:#f5f5f5;color:#999}
+.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.badge{text-align:center;padding:15px 8px;border-radius:12px;background:#f5f5f5;border:2px solid #e0e0e0}
+.badge.earned{background:#fff3cd;border-color:#ffc107}
+.badge .icon{font-size:2em;display:block;margin-bottom:5px}
+.badge .name{font-size:.8em;font-weight:600;color:#333}
+.badge .desc{font-size:.7em;color:#888;margin-top:3px}
+.badge:not(.earned) .icon{filter:grayscale(1);opacity:.4}
+.streak-box{background:linear-gradient(135deg,#34d399,#059669);border-radius:14px;padding:18px;color:#fff;text-align:center;margin-top:20px}
+.streak-num{font-size:1.6em;font-weight:700}
+.streak-label{font-size:.85em;opacity:.9}
+.name-input{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;margin-bottom:15px}
+.name-input:focus{outline:none;border-color:#0d9488}
+.btn{background:#065f46;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;width:100%;transition:all .2s}
+.btn:hover{background:#064e3b}
+.final-test-link{display:block;text-align:center;padding:18px;border-radius:14px;font-weight:700;font-size:1.05em;text-decoration:none;margin-top:20px;transition:all .2s}
+.final-test-link.locked{background:#f5f5f5;color:#999;cursor:not-allowed}
+.final-test-link.unlocked{background:linear-gradient(135deg,#f5a623,#e8470a);color:#fff;box-shadow:0 4px 15px rgba(245,166,35,.4)}
+.final-test-link.unlocked:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,166,35,.5)}
+.reset-link{text-align:center;margin-top:15px}
+.reset-link a{color:#999;font-size:.8em;text-decoration:none;cursor:pointer}
+.reset-link a:hover{color:#c62828}
+@media(max-width:500px){.badges-grid{grid-template-columns:repeat(2,1fr)}.xp-banner{flex-wrap:wrap;gap:10px}.xp-banner .stat{min-width:45%}}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="level-badge">A2 (PS2) - Elementary</div>
+        <h1>📚 A2 Quiz Dashboard</h1>
+        <p>Term 1/2026 • Track your progress</p>
+    </div>
+
+    <!-- Name Entry (shown if no name saved) -->
+    <div class="card" id="nameCard" style="display:none">
+        <h2>👋 Welcome!</h2>
+        <p style="color:#666;margin-bottom:15px">Enter your name to track your progress across all quizzes.</p>
+        <input type="text" class="name-input" id="nameInput" placeholder="Enter your full name...">
+        <button class="btn" onclick="saveName()">Start Learning →</button>
+    </div>
+
+    <!-- Dashboard (shown after name) -->
+    <div id="dashboard" style="display:none">
+        <!-- Welcome / Motivation -->
+        <div class="card welcome-card">
+            <div class="welcome-icon" id="welcomeIcon">🚀</div>
+            <div class="welcome-msg" id="welcomeMsg">Let's begin your A2 journey!</div>
+            <div class="sub" id="welcomeSub">Complete Quiz 1 to start earning XP</div>
+        </div>
+
+        <!-- XP Stats Banner -->
+        <div class="xp-banner">
+            <div class="stat"><span class="num" id="totalXP">0</span><span class="lbl">Total XP</span></div>
+            <div class="stat"><span class="num" id="quizzesDone">0/5</span><span class="lbl">Quizzes</span></div>
+            <div class="stat"><span class="num" id="avgScore">-</span><span class="lbl">Avg Score</span></div>
+        </div>
+
+        <!-- Progress & Quiz List -->
+        <div class="card">
+            <h2>📈 Progress to Final Test</h2>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-title">Overall Progress</span>
+                    <span class="progress-percent" id="overallPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="overallBar" style="width:0%"></div>
+                </div>
+            </div>
+
+            <div class="quiz-list" id="quizList"></div>
+
+            <a href="#" class="final-test-link locked" id="finalTestLink">
+                🔒 Complete all quizzes to unlock Final Test
+            </a>
+        </div>
+
+        <!-- Badges -->
+        <div class="card">
+            <h2>🏅 Your Badges</h2>
+            <div class="badges-grid" id="badgesGrid"></div>
+            <div class="streak-box" id="streakBox" style="display:none">
+                <div class="streak-num" id="streakDisplay">🔥 0</div>
+                <div class="streak-label">Quiz Streak — Keep it going!</div>
+            </div>
+        </div>
+
+        <div class="reset-link"><a onclick="resetProgress()">Reset all progress</a></div>
+    </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'SQA_A2_Quiz_Progress';
+
+const quizzes = [
+    { id: 1, title: "Present Simple: Verb Forms", desc: "Third person -s/-es/-ies & base forms", week: "Class 3", file: "a2-quiz-1-class3.html", icon: "📝" },
+    { id: 2, title: "Daily Routines & Negatives", desc: "Routines, do not / does not", week: "Class 5", file: "a2-quiz-2-class5.html", icon: "🌅" },
+    { id: 3, title: "Family & Jobs Vocabulary", desc: "Family members, professions, workplace", week: "Class 8", file: "a2-quiz-3-class8.html", icon: "👨‍👩‍👧‍👦" },
+    { id: 4, title: "Present Continuous", desc: "am/is/are + verb-ing (affirmative, negative, questions)", week: "Class 11", file: "a2-quiz-4-class11.html", icon: "🔄" },
+    { id: 5, title: "Past Simple: Vacations", desc: "Regular & irregular past tense verbs", week: "Class 14", file: "a2-quiz-5-class14.html", icon: "✈️" }
+];
+
+const badges = [
+    { id: "first_steps", name: "First Steps", icon: "🌟", desc: "Complete your first quiz" },
+    { id: "sharpshooter", name: "Sharpshooter", icon: "🎯", desc: "Score 100% on any quiz" },
+    { id: "on_fire", name: "On Fire", icon: "🔥", desc: "3 quizzes in a row" },
+    { id: "speed_demon", name: "Speed Demon", icon: "⚡", desc: "Finish a quiz under 3 min" },
+    { id: "dedicated", name: "Dedicated Learner", icon: "📚", desc: "Complete all 5 quizzes" },
+    { id: "a2_champion", name: "A2 Champion", icon: "🏆", desc: "Score 80%+ on all quizzes" }
+];
+
+const motivational = [
+    { min: 0, max: 0, icon: "🚀", msg: "Let's begin your A2 journey!", sub: "Complete Quiz 1 to start earning XP" },
+    { min: 1, max: 1, icon: "💪", msg: "Great start! Keep going!", sub: "Quiz 2 is unlocked — you've got this!" },
+    { min: 2, max: 2, icon: "🌟", msg: "You're building momentum!", sub: "Almost halfway through!" },
+    { min: 3, max: 3, icon: "🔥", msg: "More than halfway! Amazing!", sub: "Just 2 more quizzes to go" },
+    { min: 4, max: 4, icon: "⭐", msg: "One more quiz to go!", sub: "You're almost at the finish line!" },
+    { min: 5, max: 5, icon: "🏆", msg: "ALL QUIZZES COMPLETE!", sub: "You're ready for the Final Test! 🎉" }
+];
+
+function getProgress() {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : { quizzes: {}, totalXP: 0, streak: 0, badges: [], name: '' };
+}
+
+function saveProgress(p) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+}
+
+function init() {
+    const progress = getProgress();
+    if (!progress.name) {
+        document.getElementById('nameCard').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'none';
+    } else {
+        document.getElementById('nameCard').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        renderDashboard(progress);
+    }
+}
+
+function saveName() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) { alert('Please enter your name'); return; }
+    const progress = getProgress();
+    progress.name = name;
+    saveProgress(progress);
+    init();
+}
+
+function renderDashboard(progress) {
+    const done = Object.keys(progress.quizzes || {}).length;
+
+    // Motivational message
+    const mot = motivational.find(m => done >= m.min && done <= m.max) || motivational[0];
+    document.getElementById('welcomeIcon').textContent = mot.icon;
+    document.getElementById('welcomeMsg').textContent = mot.msg;
+    document.getElementById('welcomeSub').textContent = progress.name + ' — ' + mot.sub;
+
+    // XP stats
+    document.getElementById('totalXP').textContent = progress.totalXP || 0;
+    document.getElementById('quizzesDone').textContent = done + '/5';
+
+    // Average score
+    const qData = progress.quizzes || {};
+    const scores = Object.values(qData).map(q => Math.round((q.score / q.total) * 100));
+    document.getElementById('avgScore').textContent = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) + '%' : '-';
+
+    // Overall progress bar
+    const overallPct = Math.round((done / 5) * 100);
+    document.getElementById('overallPercent').textContent = overallPct + '%';
+    document.getElementById('overallBar').style.width = overallPct + '%';
+
+    // Quiz list
+    let listHTML = '';
+    quizzes.forEach((quiz, idx) => {
+        const qResult = qData[quiz.id];
+        const isCompleted = !!qResult;
+        const isUnlocked = idx === 0 || !!qData[quizzes[idx - 1].id];
+        const status = isCompleted ? 'completed' : isUnlocked ? 'available' : 'locked';
+
+        let scoreHTML = '';
+        let statusHTML = '';
+
+        if (isCompleted) {
+            const pct = Math.round((qResult.score / qResult.total) * 100);
+            scoreHTML = `<div class="quiz-score"><div class="pct">${pct}%</div><div class="lbl">${qResult.score}/${qResult.total}</div></div>`;
+            statusHTML = `<span class="quiz-status status-done">✅ Done</span>`;
+        } else if (isUnlocked) {
+            statusHTML = `<span class="quiz-status status-go">▶ Start</span>`;
+        } else {
+            statusHTML = `<span class="quiz-status status-lock">🔒 Locked</span>`;
+        }
+
+        const clickAction = isCompleted || isUnlocked ? `onclick="window.location.href='${quiz.file}'"` : '';
+
+        listHTML += `
+        <div class="quiz-item ${status}" ${clickAction}>
+            <div class="quiz-num">${quiz.icon || idx + 1}</div>
+            <div class="quiz-info">
+                <div class="quiz-title">${quiz.title}</div>
+                <div class="quiz-desc">${quiz.week} • ${quiz.desc}</div>
+            </div>
+            ${scoreHTML}
+            ${statusHTML}
+        </div>`;
+    });
+    document.getElementById('quizList').innerHTML = listHTML;
+
+    // Final test link
+    const ftLink = document.getElementById('finalTestLink');
+    if (done >= 5) {
+        ftLink.classList.remove('locked');
+        ftLink.classList.add('unlocked');
+        ftLink.textContent = '🎓 Take the Final Test →';
+        ftLink.href = 'a2-final-test.html';
+    }
+
+    // Badges
+    const earnedBadges = progress.badges || [];
+    let badgeHTML = '';
+    badges.forEach(b => {
+        const earned = earnedBadges.includes(b.id);
+        badgeHTML += `
+        <div class="badge ${earned ? 'earned' : ''}">
+            <span class="icon">${b.icon}</span>
+            <div class="name">${b.name}</div>
+            <div class="desc">${earned ? '✅ Earned!' : b.desc}</div>
+        </div>`;
+    });
+    document.getElementById('badgesGrid').innerHTML = badgeHTML;
+
+    // Streak
+    if ((progress.streak || 0) > 1) {
+        document.getElementById('streakBox').style.display = 'block';
+        document.getElementById('streakDisplay').textContent = '🔥 ' + progress.streak + ' Quiz Streak!';
+    }
+}
+
+function resetProgress() {
+    if (confirm('Are you sure? This will erase all your A2 quiz progress, XP, and badges.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
